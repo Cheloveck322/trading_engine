@@ -1,0 +1,4 @@
+/home/cheloveck/cppfolder/trading_engine/build/CMakeFiles/source.dir
+/home/cheloveck/cppfolder/trading_engine/build/CMakeFiles/trading_engine.dir
+/home/cheloveck/cppfolder/trading_engine/build/CMakeFiles/edit_cache.dir
+/home/cheloveck/cppfolder/trading_engine/build/CMakeFiles/rebuild_cache.dir
