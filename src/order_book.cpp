@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iostream>
 
-std::optional<Trade> OrderBook::processOrder(const Order& order)
+std::optional<Trade> OrderBook::processOrder(Order order)
 {
     if (order.side == Side::Buy)
     {
@@ -16,11 +16,15 @@ std::optional<Trade> OrderBook::processOrder(const Order& order)
             Trade trade{ order.id, sellOrder.id, sellOrder.price, qty, std::chrono::steady_clock::now() };
 
             sellOrder.quantity -= qty;
+            order.quantity -= qty;
 
             if (sellOrder.quantity == 0)
                 queue.pop_front();
             if (queue.empty())
                 _asks.erase(bestAsk);
+
+            if (order.quantity > 0)
+                addOrder(order);
 
             return trade;
         }
@@ -42,11 +46,15 @@ std::optional<Trade> OrderBook::processOrder(const Order& order)
             Trade trade{ buyOrder.id, order.id, buyOrder.price, qty, std::chrono::steady_clock::now() };
 
             buyOrder.quantity -= qty;
+            order.quantity -= qty;
 
             if (buyOrder.quantity == 0)
                 queue.pop_front();
             if (queue.empty())
                 _bids.erase(bestBid);
+
+            if (order.quantity > 0)
+                addOrder(order);
 
             return trade;
         }

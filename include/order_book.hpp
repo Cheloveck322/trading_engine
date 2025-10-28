@@ -17,7 +17,7 @@ private:
 public:
     OrderBook() = default;
 
-    std::optional<Trade> processOrder(const Order& order);
+    std::optional<Trade> processOrder(Order order);
     void addOrder(const Order& order);
     void printBook() const;
 };
