@@ -67,43 +67,13 @@ void OrderBook::addOrder(const Order& order)
         _asks[order.price].push_back(order);
 }
 
-void OrderBook::printBook() const
+void OrderBook::printBook() const 
 {
-    if (_bids.empty())
-    {
-        std::cout << "bids is empty.\n";
-    }
-    else
-    {
-        std::cout << "bids:\n";
-        for (const auto& a : _bids)
-        {
-            std::cout << "cost = " << a.first << ' ';
-            for (const auto& b : a.second)
-            {
-                std::cout << "\tid = " << b.id << '\n' 
-                << "\tprice = " << b.price << '\n'
-                << "\tquantity = " << b.quantity << "\n";
-            }
-        }
-    }
+    std::cout << "--- Asks ---\n";
+    for (auto& [price, queue] : _asks)
+        std::cout << price << " (" << queue.size() << " orders)\n";
 
-    if (_asks.empty())
-    {
-        std::cout << "asks is empty\n";
-    }
-    else
-    {
-        std::cout << "asks:\n";
-        for (const auto& a : _asks)
-        {
-            std::cout << "cost = " << a.first << ' ';
-            for (const auto& b : a.second)
-            {
-                std::cout << "\tid = " << b.id << '\n' 
-                << "\tprice = " << b.price << '\n'
-                << "\tquantity = " << b.quantity << "\n";
-            }
-        }
-    }   
+    std::cout << "--- Bids ---\n";
+    for (auto& [price, queue] : _bids)
+        std::cout << price << " (" << queue.size() << " orders)\n";
 }

@@ -15,6 +15,12 @@ struct Order
     double price;
     uint64_t quantity;
     std::chrono::steady_clock::time_point timestamp;
+
+    Order(uint64_t _id, Side _side, OrderType _type, double _price, uint64_t _qty)
+        : id{ _id }, side{ _side }, type{ _type }, price{ _price }, 
+            timestamp{ std::chrono::steady_clock::now() }
+    {
+    } 
 };
 
 #endif //ORDER_HPP
