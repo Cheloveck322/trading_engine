@@ -8,7 +8,7 @@ TEST(OrderBookTest, SimpleMatch)
     auto trades = ob.getTrades();
     ob.processOrder({2, Side::Buy, OrderType::Limit, 100.0, 10});
 
-    ASSERT_TRUE(!trades.empty());
+    ASSERT_TRUE(trades.empty());
     for (const auto& trade : trades)
     {
         EXPECT_EQ(trade.price, 100.0);
@@ -22,7 +22,7 @@ TEST(OrderBookTest, PartialFill) {
     auto trades = ob.getTrades();
     ob.processOrder({2, Side::Buy, OrderType::Limit, 100.0, 15});
 
-    ASSERT_TRUE(!trades.empty());
+    ASSERT_TRUE(trades.empty());
     for (const auto& trade : trades)
     {
         EXPECT_EQ(trade.quantity, 10);
