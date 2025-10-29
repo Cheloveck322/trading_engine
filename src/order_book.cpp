@@ -2,72 +2,114 @@
 #include <algorithm>
 #include <iostream>
 
-std::optional<Trade> OrderBook::processOrder(Order order)
+void OrderBook::processOrder(Order order) noexcept
 {
-    if (order.side == Side::Buy)
+    if (order.type == OrderType::Market)
     {
-        auto bestAsk { _asks.begin() };
-        if (bestAsk != _asks.end() && order.price >= bestAsk->first)
+        if (order.side == Side::Buy)
         {
-            auto& queue{ bestAsk->second };
-            Order& sellOrder{ queue.front() };
+            auto bestAsk { _asks.begin() };
+            while (bestAsk != _asks.end() && order.quantity > 0)
+            {
+                auto& queue{ bestAsk->second };
+                Order& sellOrder{ queue.front() };
 
-            uint64_t qty { std::min(sellOrder.quantity, order.quantity) };
-            Trade trade{ order.id, sellOrder.id, sellOrder.price, qty, std::chrono::steady_clock::now() };
+                uint64_t qty{ std::min(order.quantity, sellOrder.quantity) };
+                _trades.push_back({ order.id, sellOrder.id, sellOrder.price, qty, std::chrono::steady_clock::now() });
 
-            sellOrder.quantity -= qty;
-            order.quantity -= qty;
+                sellOrder.quantity -= qty;
+                order.quantity -= qty;
 
-            if (sellOrder.quantity == 0)
-                queue.pop_front();
-            if (queue.empty())
-                _asks.erase(bestAsk);
-
-            if (order.quantity > 0)
-                addOrder(order);
-
-            return trade;
+                if (sellOrder.quantity == 0)
+                    queue.pop_front();
+                if (queue.empty())
+                    _asks.erase(bestAsk);
+                else 
+                {
+                    ++bestAsk;
+                }
+            }
         }
-        else 
+        if (order.side == Side::Sell)
         {
-            addOrder(order);
-        }
-    }
-    else if (order.side == Side::Sell)
-    {
-        auto bestBid { _bids.begin() };
+            auto bestBid { _bids.begin() };
+            while (bestBid != _bids.end() && order.quantity > 0)
+            {
+                auto& queue{ bestBid->second };
+                Order& buyOrder{ queue.front() };
 
-        if (bestBid != _bids.end() && order.price <= bestBid->first)
-        {
-            auto& queue{ bestBid->second };
-            Order& buyOrder{ queue.front() };
-            
-            uint64_t qty { std::min(buyOrder.quantity, order.quantity) };
-            Trade trade{ buyOrder.id, order.id, buyOrder.price, qty, std::chrono::steady_clock::now() };
+                uint64_t qty{ std::min(order.quantity, buyOrder.quantity) };
+                _trades.push_back({ buyOrder.id, order.id, buyOrder.price, qty, std::chrono::steady_clock::now() });
 
-            buyOrder.quantity -= qty;
-            order.quantity -= qty;
+                buyOrder.quantity -= qty;
+                order.quantity -= qty;
 
-            if (buyOrder.quantity == 0)
-                queue.pop_front();
-            if (queue.empty())
-                _bids.erase(bestBid);
-
-            if (order.quantity > 0)
-                addOrder(order);
-
-            return trade;
-        }
-        else 
-        {
-            addOrder(order);
+                if (buyOrder.quantity == 0)
+                    queue.pop_front();
+                if (queue.empty())
+                    _asks.erase(bestBid);
+                else 
+                {
+                    ++bestBid;
+                }
+            }
         }
     }
 
-    return std::nullopt;
+    else if (order.type == OrderType::Limit)
+    {
+        if (order.side == Side::Buy)
+        {
+            auto bestAsk { _asks.begin() };
+            if (bestAsk != _asks.end()  && order.price >= bestAsk->first)
+            {
+                auto& queue{ bestAsk->second };
+                Order& sellOrder{ queue.front() };
+
+                uint64_t qty { std::min(sellOrder.quantity, order.quantity) };
+                _trades.push_back({ order.id, sellOrder.id, sellOrder.price, qty, std::chrono::steady_clock::now() });
+
+                sellOrder.quantity -= qty;
+                order.quantity -= qty;
+
+                if (sellOrder.quantity == 0)
+                    queue.pop_front();
+                if (queue.empty())
+                    _asks.erase(bestAsk);
+                if (order.quantity > 0)
+                    addOrder(order);
+            }
+            else
+                addOrder(order);
+        }
+        else if (order.side == Side::Sell)
+        {
+            auto bestBid { _bids.begin() };
+            if (bestBid != _bids.end() && order.price <= bestBid->first)
+            {
+                auto& queue{ bestBid->second };
+                Order& buyOrder{ queue.front() };
+                
+                uint64_t qty { std::min(buyOrder.quantity, order.quantity) };
+                _trades.push_back({ buyOrder.id, order.id, buyOrder.price, qty, std::chrono::steady_clock::now() });
+
+                buyOrder.quantity -= qty;
+                order.quantity -= qty;
+
+                if (buyOrder.quantity == 0)
+                    queue.pop_front();
+                if (queue.empty())
+                    _bids.erase(bestBid);
+                if (order.quantity > 0)
+                    addOrder(order);
+            }
+            else 
+                addOrder(order);
+        }
+    }
 }
 
-void OrderBook::addOrder(const Order& order)
+void OrderBook::addOrder(const Order& order) noexcept
 {
     if (order.side == Side::Buy)
         _bids[order.price].push_back(order);
@@ -75,7 +117,7 @@ void OrderBook::addOrder(const Order& order)
         _asks[order.price].push_back(order);
 }
 
-void OrderBook::printBook() const 
+void OrderBook::printBook() const noexcept  
 {
     std::cout << "--- Asks ---\n";
     for (auto& [price, queue] : _asks)
