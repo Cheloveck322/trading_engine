@@ -49,3 +49,18 @@ target_link_libraries(benchmark_orderbook
     benchmark::benchmark
     source
 )
+
+find_package(GTest REQUIRED)
+
+add_executable(test_engine
+    tests/engine_test.cpp
+)
+
+target_link_libraries(test_engine
+    GTest::gtest
+    GTest::gtest_main
+    source
+)
+
+enable_testing()
+add_test(NAME MatchingEngineTests COMMAND test_engine)
