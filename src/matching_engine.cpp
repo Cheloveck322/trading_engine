@@ -10,7 +10,7 @@ void MatchingEngine::processOrder(Order order) noexcept
     _orderBook.processOrder(order);
 
     if (!_orderBook.getTrades().empty())
-        report.status = (_orderBook.getLastOrder()->quantity == 0) ? "filled" : "partially_filled";
+        report.status = (_orderBook.getLastOrder().quantity == 0) ? "filled" : "partially_filled";
     else
         report.status = "accepted";
 

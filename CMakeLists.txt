@@ -20,7 +20,7 @@ add_library(source
 
 add_executable(trading_engine src/main.cpp)
 
-target_link_libraries(trading_engine source)
+target_link_libraries(trading_engine source pthread)
 
 # unit-тесты
 find_package(GTest REQUIRED)
@@ -33,6 +33,7 @@ target_link_libraries(test_orderbook
     GTest::gtest
     GTest::gtest_main
     source
+    pthread
 )
 
 enable_testing()
@@ -48,6 +49,7 @@ add_executable(benchmark_orderbook
 target_link_libraries(benchmark_orderbook
     benchmark::benchmark
     source
+    pthread
 )
 
 find_package(GTest REQUIRED)
@@ -60,6 +62,7 @@ target_link_libraries(test_engine
     GTest::gtest
     GTest::gtest_main
     source
+    pthread
 )
 
 enable_testing()

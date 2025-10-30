@@ -18,13 +18,13 @@ public:
     void addOrder(const Order& order) noexcept;
     void printBook() const noexcept;
     const std::vector<Trade>& getTrades() const noexcept { return _trades; }
-    const std::shared_ptr<Order> getLastOrder() const noexcept { return _lastOrder; };
+    const Order getLastOrder() const noexcept { return _lastOrder; };
 
 private:
-    std::map<double, std::deque<std::shared_ptr<Order>>, std::greater<>> _bids;
-    std::map<double, std::deque<std::shared_ptr<Order>>, std::less<>> _asks;
+    std::map<double, std::deque<Order>, std::greater<>> _bids;
+    std::map<double, std::deque<Order>, std::less<>> _asks;
     std::vector<Trade> _trades;
-    std::shared_ptr<Order> _lastOrder;
+    Order _lastOrder;
 };
 
 #endif //ORDER_BOOK_HPP

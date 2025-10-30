@@ -12,15 +12,15 @@ void OrderBook::processOrder(Order order)
             while (bestAsk != _asks.end() && order.quantity > 0)
             {
                 auto& queue{ bestAsk->second };
-                std::shared_ptr<Order> sellOrder{ queue.front() };
+                Order sellOrder{ queue.front() };
 
-                uint64_t qty{ std::min(order.quantity, sellOrder->quantity) };
-                _trades.emplace_back(Trade{ order.id, sellOrder->id, sellOrder->price, qty, std::chrono::steady_clock::now() });
+                uint64_t qty{ std::min(order.quantity, sellOrder.quantity) };
+                _trades.emplace_back(Trade{ order.id, sellOrder.id, sellOrder.price, qty, std::chrono::steady_clock::now() });
 
-                sellOrder->quantity -= qty;
+                sellOrder.quantity -= qty;
                 order.quantity -= qty;
 
-                if (sellOrder->quantity == 0)
+                if (sellOrder.quantity == 0)
                     queue.pop_front();
                 if (queue.empty())
                     bestAsk = _asks.erase(bestAsk);
@@ -34,15 +34,15 @@ void OrderBook::processOrder(Order order)
             while (bestBid != _bids.end() && order.quantity > 0)
             {
                 auto& queue{ bestBid->second };
-                std::shared_ptr<Order> buyOrder{ queue.front() };
+                Order buyOrder{ queue.front() };
 
-                uint64_t qty{ std::min(order.quantity, buyOrder->quantity) };
-                _trades.emplace_back(Trade{ buyOrder->id, order.id, buyOrder->price, qty, std::chrono::steady_clock::now() });
+                uint64_t qty{ std::min(order.quantity, buyOrder.quantity) };
+                _trades.emplace_back(Trade{ buyOrder.id, order.id, buyOrder.price, qty, std::chrono::steady_clock::now() });
 
-                buyOrder->quantity -= qty;
+                buyOrder.quantity -= qty;
                 order.quantity -= qty;
 
-                if (buyOrder->quantity == 0)
+                if (buyOrder.quantity == 0)
                     queue.pop_front();
                 if (queue.empty())
                     bestBid = _bids.erase(bestBid);
@@ -59,15 +59,15 @@ void OrderBook::processOrder(Order order)
             if (bestAsk != _asks.end()  && order.price >= bestAsk->first)
             {
                 auto& queue{ bestAsk->second };
-                std::shared_ptr<Order> sellOrder{ queue.front() };
+                Order sellOrder{ queue.front() };
 
-                uint64_t qty { std::min(sellOrder->quantity, order.quantity) };
-                _trades.emplace_back(Trade{ order.id, sellOrder->id, sellOrder->price, qty, std::chrono::steady_clock::now() });
+                uint64_t qty { std::min(sellOrder.quantity, order.quantity) };
+                _trades.emplace_back(Trade{ order.id, sellOrder.id, sellOrder.price, qty, std::chrono::steady_clock::now() });
 
-                sellOrder->quantity -= qty;
+                sellOrder.quantity -= qty;
                 order.quantity -= qty;
 
-                if (sellOrder->quantity == 0)
+                if (sellOrder.quantity == 0)
                     queue.pop_front();
                 if (queue.empty())
                     _asks.erase(bestAsk);
@@ -83,15 +83,15 @@ void OrderBook::processOrder(Order order)
             if (bestBid != _bids.end() && order.price <= bestBid->first)
             {
                 auto& queue{ bestBid->second };
-                std::shared_ptr<Order> buyOrder{ queue.front() };
+                Order buyOrder{ queue.front() };
                 
-                uint64_t qty { std::min(buyOrder->quantity, order.quantity) };
-                _trades.emplace_back(Trade{ buyOrder->id, order.id, buyOrder->price, qty, std::chrono::steady_clock::now() });
+                uint64_t qty { std::min(buyOrder.quantity, order.quantity) };
+                _trades.emplace_back(Trade{ buyOrder.id, order.id, buyOrder.price, qty, std::chrono::steady_clock::now() });
 
-                buyOrder->quantity -= qty;
+                buyOrder.quantity -= qty;
                 order.quantity -= qty;
 
-                if (buyOrder->quantity == 0)
+                if (buyOrder.quantity == 0)
                     queue.pop_front();
                 if (queue.empty())
                     _bids.erase(bestBid);
@@ -102,15 +102,15 @@ void OrderBook::processOrder(Order order)
                 addOrder(order);
         }
     }
-    _lastOrder = std::make_shared<Order>(order);
+    _lastOrder = order;
 }
 
 void OrderBook::addOrder(const Order& order) noexcept
 {
     if (order.side == Side::Buy)
-        _bids[order.price].emplace_back(std::make_shared<Order>(order));
+        _bids[order.price].emplace_back(order);
     else if (order.side == Side::Sell)
-        _asks[order.price].emplace_back(std::make_shared<Order>(order));
+        _asks[order.price].emplace_back(order);
 }
 
 void OrderBook::printBook() const noexcept  
