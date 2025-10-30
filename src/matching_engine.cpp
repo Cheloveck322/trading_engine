@@ -7,13 +7,14 @@ void MatchingEngine::processOrder(Order order) noexcept
     report.id = order.id;
     report.price = order.price;
     report.quantity = order.quantity;
+    _orderBook.processOrder(order);
 
     if (!_orderBook.getTrades().empty())
-        report.status = (order.quantity == 0) ? "filled" : "partially_filled";
+        report.status = (_orderBook.getLastOrder()->quantity == 0) ? "filled" : "partially_filled";
     else
         report.status = "accepted";
 
-    _reports.push_back(report);
+    _reports.emplace_back(report);
 }
 
 void MatchingEngine::printReports() const noexcept

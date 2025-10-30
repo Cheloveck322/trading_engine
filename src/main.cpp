@@ -3,6 +3,7 @@
 #include <iostream>
 
 int main() {
+    auto start = std::chrono::high_resolution_clock::now();
     OrderBook ob;
     ob.processOrder({1, Side::Buy, OrderType::Limit, 100.0, 10});
     ob.processOrder({2, Side::Sell, OrderType::Limit, 100.0, 5});
@@ -19,4 +20,9 @@ int main() {
     engine.processOrder({3, Side::Buy, OrderType::Market, 0.0, 5});
 
     engine.printReports();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Latency: "
+          << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+          << " μs\n";
 }

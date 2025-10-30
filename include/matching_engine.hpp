@@ -16,7 +16,6 @@ class MatchingEngine
 {
 public:
     MatchingEngine() = default;
-
     void processOrder(Order order) noexcept;
     const auto& getReports() const noexcept { return _reports; }
     const auto& getOrderBook() const noexcept { return _orderBook; }
