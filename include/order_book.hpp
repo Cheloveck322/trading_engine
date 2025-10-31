@@ -21,8 +21,8 @@ public:
     const Order getLastOrder() const noexcept { return _lastOrder; };
 
 private:
-    std::map<double, std::deque<Order>, std::greater<>> _bids;
-    std::map<double, std::deque<Order>, std::less<>> _asks;
+    std::map<double, std::deque<std::shared_ptr<Order>>, std::greater<>> _bids;
+    std::map<double, std::deque<std::shared_ptr<Order>>, std::less<>> _asks;
     std::vector<Trade> _trades;
     Order _lastOrder;
 };
