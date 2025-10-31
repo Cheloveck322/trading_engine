@@ -16,7 +16,9 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_library(source
     src/order_book.cpp
-    src/matching_engine.cpp)
+    src/matching_engine.cpp
+    src/spscqueue.tpp
+    )
 
 add_executable(trading_engine src/main.cpp)
 
