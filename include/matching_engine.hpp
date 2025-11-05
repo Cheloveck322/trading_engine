@@ -3,6 +3,7 @@
 
 #include "order_book.hpp"
 #include <string>
+#include "../include/logger.hpp"
 
 struct ExecutionReport
 {
@@ -26,6 +27,7 @@ public:
 private:
     OrderBook _orderBook;
     std::vector<ExecutionReport> _reports;
+    Logger _logger;
 };
 
 

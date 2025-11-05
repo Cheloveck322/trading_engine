@@ -15,6 +15,7 @@ void MatchingEngine::processOrder(Order order) noexcept
         report.status = "accepted";
 
     _reports.emplace_back(report);
+    
 }
 
 void MatchingEngine::printReports() const noexcept
