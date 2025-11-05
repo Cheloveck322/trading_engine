@@ -17,9 +17,11 @@ class MatchingEngine
 public:
     MatchingEngine() = default;
     void processOrder(Order order) noexcept;
+    void processBatchOrders(const std::vector<Order>& orders);
     const auto& getReports() const noexcept { return _reports; }
     const auto& getOrderBook() const noexcept { return _orderBook; }
     void printReports() const noexcept;
+
 
 private:
     OrderBook _orderBook;

@@ -26,3 +26,11 @@ void MatchingEngine::printReports() const noexcept
                   << " @ " << r.price << std::endl;
     }
 }
+
+void MatchingEngine::processBatchOrders(const std::vector<Order>& orders)
+{
+    for (const auto& order : orders)
+    {
+        processOrder(order);
+    }
+}
