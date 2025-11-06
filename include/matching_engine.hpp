@@ -4,6 +4,7 @@
 #include "order_book.hpp"
 #include <string>
 #include "logger.hpp"
+#include <cstdint>
 
 struct ExecutionReport
 {
@@ -11,6 +12,13 @@ struct ExecutionReport
     std::string status; // accepted, filled, partially_filled, rejected
     double price;
     uint64_t quantity; 
+};
+
+struct Metrics 
+{
+    uint64_t processed_orders = 0;
+    uint64_t executed_trades = 0;
+    double avg_latency_us = 0.0;
 };
 
 class MatchingEngine
@@ -28,6 +36,7 @@ private:
     OrderBook _orderBook;
     Logger _logger{ "trades.log" };
     std::vector<ExecutionReport> _reports;
+    Metrics _metrics;
 };
 
 

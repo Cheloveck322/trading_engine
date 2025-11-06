@@ -18,13 +18,24 @@ void MatchingEngine::processOrder(Order order) noexcept
     report.id = order.id;
     report.price = order.price;
     report.quantity = order.quantity;
+
+    auto start = std::chrono::high_resolution_clock::now();
     _orderBook.processOrder(order);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    _metrics.processed_orders++;
+    double latency = std::chrono::duration<double, std::micro>(end - start).count();
+    _metrics.avg_latency_us += (latency - _metrics.avg_latency_us) / _metrics.processed_orders;
 
     if (!_orderBook.getTrades().empty())
+    {
         report.status = (_orderBook.getLastOrder().quantity == 0) ? "filled" : "partially_filled";
+        _metrics.executed_trades = _orderBook.getTrades().size();
+    }
     else
+    {
         report.status = "accepted";
-
+    }
     _reports.emplace_back(report);
 }
 
