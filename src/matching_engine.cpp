@@ -1,6 +1,17 @@
 #include "../include/matching_engine.hpp"
 #include <iostream>
 
+MatchingEngine::MatchingEngine():
+    _orderBook{}, _logger{ "trades.log" }, _reports{}
+{
+    _orderBook.setOnTradeCallback([this](const Trade& t) {
+        _logger.log("TRADE ",
+                    t.buy_id, "->", t.sell_id,
+                    " qty=", t.quantity,
+                    " price=", t.price);
+    });
+}
+
 void MatchingEngine::processOrder(Order order) noexcept
 {
     ExecutionReport report;
@@ -15,7 +26,6 @@ void MatchingEngine::processOrder(Order order) noexcept
         report.status = "accepted";
 
     _reports.emplace_back(report);
-    
 }
 
 void MatchingEngine::printReports() const noexcept

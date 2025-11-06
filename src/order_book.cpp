@@ -15,7 +15,11 @@ void OrderBook::processOrder(Order order)
                 std::shared_ptr<Order> sellOrder{ queue.front() };
 
                 uint64_t qty{ std::min(order.quantity, sellOrder->quantity) };
-                _trades.emplace_back(Trade{ order.id, sellOrder->id, sellOrder->price, qty, std::chrono::steady_clock::now() });
+                Trade trade{ order.id, sellOrder->id, sellOrder->price, qty, std::chrono::steady_clock::now() };
+                _trades.emplace_back(trade);
+                
+                if (_onTradeCallback) 
+                    _onTradeCallback(trade);
 
                 sellOrder->quantity -= qty;
                 order.quantity -= qty;
@@ -28,7 +32,7 @@ void OrderBook::processOrder(Order order)
                     ++bestAsk;
             }
         }
-        if (order.side == Side::Sell)
+        else if (order.side == Side::Sell)
         {
             auto bestBid { _bids.begin() };
             while (bestBid != _bids.end() && order.quantity > 0)
@@ -37,7 +41,11 @@ void OrderBook::processOrder(Order order)
                 std::shared_ptr<Order> buyOrder{ queue.front() };
 
                 uint64_t qty{ std::min(order.quantity, buyOrder->quantity) };
-                _trades.emplace_back(Trade{ buyOrder->id, order.id, buyOrder->price, qty, std::chrono::steady_clock::now() });
+                Trade trade{ buyOrder->id, order.id, buyOrder->price, qty, std::chrono::steady_clock::now() };
+                _trades.emplace_back(trade);
+                
+                if (_onTradeCallback)
+                    _onTradeCallback(trade);
 
                 buyOrder->quantity -= qty;
                 order.quantity -= qty;
@@ -62,7 +70,11 @@ void OrderBook::processOrder(Order order)
                 std::shared_ptr<Order> sellOrder{ queue.front() };
 
                 uint64_t qty { std::min(sellOrder->quantity, order.quantity) };
-                _trades.emplace_back(Trade{ order.id, sellOrder->id, sellOrder->price, qty, std::chrono::steady_clock::now() });
+                Trade trade{ order.id, sellOrder->id, sellOrder->price, qty, std::chrono::steady_clock::now() };
+                _trades.emplace_back(trade);
+
+                if (_onTradeCallback)
+                    _onTradeCallback(trade);
 
                 sellOrder->quantity -= qty;
                 order.quantity -= qty;
@@ -86,7 +98,11 @@ void OrderBook::processOrder(Order order)
                 std::shared_ptr<Order> buyOrder{ queue.front() };
                 
                 uint64_t qty { std::min(buyOrder->quantity, order.quantity) };
-                _trades.emplace_back(Trade{ buyOrder->id, order.id, buyOrder->price, qty, std::chrono::steady_clock::now() });
+                Trade trade{ buyOrder->id, order.id, buyOrder->price, qty, std::chrono::steady_clock::now() };
+                _trades.emplace_back(trade);
+
+                if (_onTradeCallback)
+                    _onTradeCallback(trade);
 
                 buyOrder->quantity -= qty;
                 order.quantity -= qty;

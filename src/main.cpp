@@ -1,7 +1,6 @@
 #include "../include/spscqueue.hpp"
 #include "../include/matching_engine.hpp"
 #include <thread>
-#include <iostream>
 #include <chrono>
 
 int main() 
@@ -54,6 +53,7 @@ int main()
     tProd.join();
     tCons.join();
 
-    std::cout << "\nAll orders processed successfully ✅\n";
+    std::cout << "\nAll orders processed successfully\n";
+
     return 0;
 }

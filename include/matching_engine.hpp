@@ -3,7 +3,7 @@
 
 #include "order_book.hpp"
 #include <string>
-#include "../include/logger.hpp"
+#include "logger.hpp"
 
 struct ExecutionReport
 {
@@ -16,7 +16,7 @@ struct ExecutionReport
 class MatchingEngine
 {
 public:
-    MatchingEngine() = default;
+    MatchingEngine();
     void processOrder(Order order) noexcept;
     void processBatchOrders(const std::vector<Order>& orders);
     const auto& getReports() const noexcept { return _reports; }
@@ -26,8 +26,8 @@ public:
 
 private:
     OrderBook _orderBook;
+    Logger _logger{ "trades.log" };
     std::vector<ExecutionReport> _reports;
-    Logger _logger;
 };
 
 
