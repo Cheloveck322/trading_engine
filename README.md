@@ -153,4 +153,4 @@ python3 analyze_trades.py
 **Grigorev Vasily**  
 GitHub: [github.com/cheloveck322](https://github.com/cheloveck322)
 
-📧 Контакт: vasyagri@gmail.com
+📧 Контакт: vasyagri2005@gmail.com
