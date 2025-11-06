@@ -51,5 +51,5 @@ plt.tight_layout()
 plt.show()
 
 # === 5. Сохраняем как CSV (для Excel/анализа) ===
-df.to_csv("trades_parsed.csv", index=False)
+df.to_csv("../logs/trades_parsed.csv", index=False)
 print(f"✅ Обработано {len(df)} сделок. Данные сохранены в trades_parsed.csv")
