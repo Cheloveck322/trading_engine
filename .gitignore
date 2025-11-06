@@ -2,3 +2,6 @@ build
 .vscode
 *.ui
 *.o
+logs
+*.log
+*.csv
