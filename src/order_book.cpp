@@ -8,10 +8,10 @@ void OrderBook::processOrder(Order order)
     {
         if (order.side == Side::Buy)
         {
-            auto bestAsk { _asks.begin() };
-            while (bestAsk != _asks.end() && order.quantity > 0)
+            auto bestAsk { getBestAskIndex() };
+            while (bestAsk != SIZE_MAX && order.quantity > 0)
             {
-                auto& queue{ bestAsk->second };
+                auto& queue{ _asks[bestAsk] };
                 std::shared_ptr<Order> sellOrder{ queue.front() };
 
                 uint64_t qty{ std::min(order.quantity, sellOrder->quantity) };
@@ -27,17 +27,15 @@ void OrderBook::processOrder(Order order)
                 if (sellOrder->quantity == 0)
                     queue.pop_front();
                 if (queue.empty())
-                    bestAsk = _asks.erase(bestAsk);
-                else
-                    ++bestAsk;
+                    bestAsk = getBestAskIndex();
             }
         }
         else if (order.side == Side::Sell)
         {
-            auto bestBid { _bids.begin() };
-            while (bestBid != _bids.end() && order.quantity > 0)
+            auto bestBid { getBestBidIndex() };
+            while (bestBid != SIZE_MAX && order.quantity > 0)
             {
-                auto& queue{ bestBid->second };
+                auto& queue{ _bids[bestBid] };
                 std::shared_ptr<Order> buyOrder{ queue.front() };
 
                 uint64_t qty{ std::min(order.quantity, buyOrder->quantity) };
@@ -53,9 +51,7 @@ void OrderBook::processOrder(Order order)
                 if (buyOrder->quantity == 0)
                     queue.pop_front();
                 if (queue.empty())
-                    bestBid = _bids.erase(bestBid);
-                else   
-                    bestBid++;
+                    bestBid = getBestBidIndex();
             }
         }
     }
@@ -63,10 +59,10 @@ void OrderBook::processOrder(Order order)
     {
         if (order.side == Side::Buy)
         {
-            auto bestAsk { _asks.begin() };
-            if (bestAsk != _asks.end()  && order.price >= bestAsk->first)
+            auto bestAsk { getBestAskIndex() };
+            if (bestAsk != SIZE_MAX  && order.price >= indexToPrice(bestAsk))
             {
-                auto& queue{ bestAsk->second };
+                auto& queue{ _asks[bestAsk] };
                 std::shared_ptr<Order> sellOrder{ queue.front() };
 
                 uint64_t qty { std::min(sellOrder->quantity, order.quantity) };
@@ -81,8 +77,6 @@ void OrderBook::processOrder(Order order)
 
                 if (sellOrder->quantity == 0)
                     queue.pop_front();
-                if (queue.empty())
-                    _asks.erase(bestAsk);
                 if (order.quantity > 0)
                     addOrder(order);
             }
@@ -91,10 +85,10 @@ void OrderBook::processOrder(Order order)
         }
         else if (order.side == Side::Sell)
         {
-            auto bestBid { _bids.begin() };
-            if (bestBid != _bids.end() && order.price <= bestBid->first)
+            auto bestBid { getBestBidIndex() };
+            if (bestBid != SIZE_MAX && order.price <= indexToPrice(bestBid))
             {
-                auto& queue{ bestBid->second };
+                auto& queue{ _bids[bestBid] };
                 std::shared_ptr<Order> buyOrder{ queue.front() };
                 
                 uint64_t qty { std::min(buyOrder->quantity, order.quantity) };
@@ -109,8 +103,6 @@ void OrderBook::processOrder(Order order)
 
                 if (buyOrder->quantity == 0)
                     queue.pop_front();
-                if (queue.empty())
-                    _bids.erase(bestBid);
                 if (order.quantity > 0)
                     addOrder(order);
             }
@@ -123,19 +115,34 @@ void OrderBook::processOrder(Order order)
 
 void OrderBook::addOrder(const Order& order) noexcept
 {
+    std::size_t index{ priceToIndex(order.price) };
+
     if (order.side == Side::Buy)
-        _bids[order.price].emplace_back(std::make_shared<Order>(order));
+        _bids[index].emplace_back(std::make_shared<Order>(order));
     else if (order.side == Side::Sell)
-        _asks[order.price].emplace_back(std::make_shared<Order>(order));
+        _asks[index].emplace_back(std::make_shared<Order>(order));
 }
 
-void OrderBook::printBook() const noexcept  
+void OrderBook::printBook() const noexcept
 {
     std::cout << "--- Asks ---\n";
-    for (auto& [price, queue] : _asks)
-        std::cout << price << " (" << queue.size() << " orders)\n";
+    for (size_t i = 0; i < _numPriceLevels; ++i)
+    {
+        if (!_asks[i].empty())
+        {
+            double price = indexToPrice(i);
+            std::cout << price << " (" << _asks[i].size() << " orders)\n";
+        }
+    }
 
     std::cout << "--- Bids ---\n";
-    for (auto& [price, queue] : _bids)
-        std::cout << price << " (" << queue.size() << " orders)\n";
+    for (size_t i = _numPriceLevels; i-- > 0;)
+    {
+        if (!_bids[i].empty())
+        {
+            double price = indexToPrice(i);
+            std::cout << price << " (" << _bids[i].size() << " orders)\n";
+        }
+    }
+    std::cout << std::endl;
 }

@@ -52,6 +52,7 @@ int main()
 
     tProd.join();
     tCons.join();
+    engine.getOrderBook().printBook();
 
     std::cout << "\nAll orders processed successfully\n";
 
