@@ -2,7 +2,6 @@
 #define ORDER_BOOK_HPP
 
 #include <deque>
-#include <map>
 #include <functional>
 #include <optional>
 #include "order.hpp"
